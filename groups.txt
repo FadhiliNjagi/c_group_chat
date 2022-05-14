@@ -1,2 +1,9 @@
 csc411
-baraka,fadhili
+,njagi,mutuku,kyalo
+
+dance
+,njagi
+
+science
+,njagi
+

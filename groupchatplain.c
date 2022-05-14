@@ -28,7 +28,7 @@ Message messages[100];
 Group groups[20];
 int users_no = 0, messages_no = 0, groups_no = 0;
 char logged_in_user[30];
-char separator[34] = "--------------------------------\n";
+char separator[] = "---------------------------------------------------\n";
 
 // Function protoypes
 void load_data();
@@ -44,6 +44,7 @@ void list_unjoined_groups();
 int chat_screen(char *group_name);
 int leave_group(char *group_name);
 int join_group(int index);
+char *get_time();
 
 /* MAIN */
 int main() {
@@ -99,7 +100,7 @@ int main() {
         goto Mainmenu;
       for (i = 0; i < groups_no; i++) {
         if (strcmp(groups[i].name, temp) == 0) {
-          printf("Match found. Opening %s chat screen...", temp);
+          printf("\nMatch found. Opening %s chat screen...\n", temp);
           if (chat_screen(temp)) {
             // If user exits chat screen
             goto Mainmenu;
@@ -117,8 +118,10 @@ int main() {
       list_joined_groups();
       printf("\n[+] Unjoined Groups\n");
       list_unjoined_groups();
-      printf("\nGroup Name: ");
+      printf("\nGroup Name (0 to go back): ");
       scanf(" %[^\n]s", temp);
+      if (strcmp(temp, "0") == 0)
+        goto Mainmenu;
       if (chat_screen(temp)) {
         // If user exits chatscreen
         goto Mainmenu;
@@ -127,18 +130,20 @@ int main() {
     case 3:
       create:
       printf(separator);
-      printf("Enter group name: ");
+      printf("Enter group name (0 to go back): ");
       scanf(" %[^\n]s", temp);
+      if (strcmp(temp, "0") == 0)
+        goto Mainmenu;
       for (i = 0; i < groups_no; i++) {
         if (groups[i].name == temp) {
           printf("Group already exists.\n");
           goto create;
         }
       }
-      groups_no++;
       strcpy(groups[groups_no].name, temp);
+      groups_no++;
       update_groups();
-      printf("The group '%s' has been created successfully", temp);
+      printf("The group '%s' has been created successfully\n", temp);
       if (chat_screen(temp)) {
         // If user exits chatscreen
         goto Mainmenu;
@@ -268,9 +273,9 @@ int signup(char *username, char *password) {
       return 1;
     }
   }
-  users_no++;
   strcpy(users[users_no].username, username);
   strcpy(users[users_no].password, password);
+  users_no++;
   update_users();
   strcpy(logged_in_user, username);
   printf("User created successfully. Welcome %s!\n", logged_in_user);
@@ -284,8 +289,8 @@ void load_group_messages() {
     groups[i].messages_no = 0;
     for (j = 0; j < messages_no; j++) {
       if (strcmp(messages[j].group_name, groups[i].name) == 0) {
-        groups[i].messages_no++;
         groups[i].messages[groups[i].messages_no] = messages[j];
+        groups[i].messages_no++;
       }
     }
   } 
@@ -323,7 +328,7 @@ void update_groups() {
   int i, j;
   fp = fopen("groups.txt", "w");
   for (i = 0; i < groups_no; i++) {
-    fprintf(fp, "%s\n", groups[i].name);
+    fprintf(fp, "%s\n,", groups[i].name);
     for (j = 0; j < 10; j++) {
       if (strlen(groups[i].members[j]) > 0) {
         if (j == 0)
@@ -332,6 +337,7 @@ void update_groups() {
           fprintf(fp, ",%s", groups[i].members[j]);
       }
     }
+    fprintf(fp, "\n\n");
   }
   fclose(fp);
 }
@@ -377,7 +383,7 @@ int chat_screen(char *group_name) {
       while (1) {
         chatscreen:
         printf(separator);
-        printf("---- Chat screen: Group %s ----\n\n", groups[i].name);
+        printf("---- Chat screen: Group '%s' ----\n\n", groups[i].name);
         // Check if current user is a member
         flag = 0;
         for (j = 0; j < 10; j++) {
@@ -386,7 +392,7 @@ int chat_screen(char *group_name) {
           }
         }
         // If user is a member, they can send messages or leave
-        if (flag == 0) {
+        if (flag == 1) {
           printf("Group members: ");
           for (j = 0; j < 10; j++) {
             if (strlen(groups[i].members[j]) > 0) {
@@ -398,7 +404,7 @@ int chat_screen(char *group_name) {
           }
           printf("\n\n");
           for (j = 0; j < groups[i].messages_no; j++) {
-            printf("[%s] %s > %s", groups[i].messages[j].sender, groups[i].messages[j].sent_at, groups[i].messages[j].message);
+            printf("[%s] %s > %s\n", groups[i].messages[j].sender, groups[i].messages[j].sent_at, groups[i].messages[j].message);
           }
           printf("\nEnter message (0 to go back, /exit to leave group): ");
           scanf(" %[^\n]s", message);
@@ -409,17 +415,19 @@ int chat_screen(char *group_name) {
           }
           else {
             // Construct message
-            time_t t = time(NULL);
-            struct tm *tm = localtime(&t);
-            messages_no++;
             strcpy(messages[messages_no].group_name, group_name);
             strcpy(messages[messages_no].message, message);
             strcpy(messages[messages_no].sender, logged_in_user);
-            strftime(messages[messages_no].sent_at, sizeof(messages[messages_no].sent_at), "%c", tm);
+            strcpy(messages[messages_no].sent_at, get_time());
+            messages_no++;
 
             // Save to group
+            strcpy(groups[i].messages[groups[i].messages_no].group_name, group_name);
+            strcpy(groups[i].messages[groups[i].messages_no].message, message);
+            strcpy(groups[i].messages[groups[i].messages_no].sender, logged_in_user);
+            strcpy(groups[i].messages[groups[i].messages_no].sent_at, get_time());
             groups[i].messages_no++;
-            groups[i].messages[groups[i].messages_no] = messages[messages_no];
+
             update_messages();
             goto chatscreen;
           }
@@ -431,7 +439,7 @@ int chat_screen(char *group_name) {
           if (strcmp(message, "n") == 0)
             return 1;
           else if (strcmp(message, "y") == 0) {
-            if (join_group(i))
+            if (!join_group(i)) // If there is no error
               goto chatscreen;
             else
               return 1; // Error while joining
@@ -466,7 +474,7 @@ int leave_group(char *group_name) {
       return 1;
     }
   }
-  printf("Group not found.");
+  printf("Group not found.\n");
   return 1;
 }
 
@@ -475,10 +483,22 @@ int join_group(int index) {
   for (j = 0; j < 10; j++) {
     if (strlen(groups[index].members[j]) == 0) {
       strcpy(groups[index].members[j], logged_in_user);
-      printf("Joined group successfully");
+      update_groups();
+      printf("Joined group successfully.\n");
       return 0;
     }
   }
   printf("Group is full.\n");
   return 1;
+}
+
+char *get_time() {
+  char *pts; /* pointer to time string */
+	time_t now; /* current time */
+	char *ctime();
+	(void) time(&now);
+  char *result = ctime(&now);
+  if (result[strlen(result)-1] == '\n' )
+    result[strlen(result)-1] = 0;
+  return result;
 }
