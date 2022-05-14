@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 typedef struct Message {
   char group_name[30];
@@ -42,7 +41,7 @@ void list_all_groups();
 void list_joined_groups();
 void list_unjoined_groups();
 int chat_screen(char *group_name);
-int leave_group(char *group_name);
+int leave_group(int index);
 int join_group(int index);
 char *get_time();
 
@@ -80,7 +79,6 @@ int main() {
         // If signup error
         goto signup;
       }
-      printf(separator);
       break;
     default:
       printf("Invalid choice.\n");
@@ -411,7 +409,10 @@ int chat_screen(char *group_name) {
           if (strcmp(message, "0") == 0) {
             return 1;
           } else if (strcmp(message, "/exit") == 0) {
-            leave_group(group_name);
+            if (!leave_group(i)) {
+              // Left group
+              return 1;
+            }
           }
           else {
             // Construct message
@@ -455,26 +456,21 @@ int chat_screen(char *group_name) {
   return 1;
 }
 
-int leave_group(char *group_name) {
-  int i, j, index;
-  for (index = 0; index < groups_no; index++) {
-    if (strcpy(groups[index].name, group_name) == 0) {
-      // Find current user and delete
-      for (i = 0; i < 10; i++) {
-        if (strcpy(groups[index].members[i], logged_in_user) == 0) {
-          for (j = i; j < 9; j++) {
-            strcpy(groups[index].members[j], groups[index].members[j + 1]);
-          }
-          strcpy(groups[index].members[9], NULL);
-          printf("You have left the group successfully.");
-          return 0;
-        }
+int leave_group(int index) {
+  int i, j;
+  // Find current user and delete
+  for (i = 0; i < 10; i++) { // Iterate thru members
+    if (strcmp(groups[index].members[i], logged_in_user) == 0) {
+      for (j = i; j < 9; j++) { // Delete by shifting
+        strcpy(groups[index].members[j], groups[index].members[j + 1]);
       }
-      printf("You are not a member of the group.");
-      return 1;
+      strcpy(groups[index].members[9], "");
+      update_groups();
+      printf("You have left the group successfully.\n");
+      return 0;
     }
   }
-  printf("Group not found.\n");
+  printf("You are not a member of the group.\n");
   return 1;
 }
 

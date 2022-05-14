@@ -1,5 +1,5 @@
 csc411
-,njagi,mutuku,kyalo
+,mutuku,kyalo
 
 dance
 ,njagi
