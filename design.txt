@@ -1,0 +1,23 @@
+1. create group
+2. my groups
+3. join an existing group
+
+-- 1
+Enter group name
+check if name is not taken
+
+-- 2
+List groups - select
+1. Send
+2. Leave group
+3. exist
+OR
+Send message (enter to go back, /exit to leave group):
+
+-- 3
+List group - select
+enter group name
+join
+redirect to groups screen/specific group screen
+
+
