@@ -66,7 +66,7 @@ int main() {
       scanf(" %[^\n]s", password);
       if (login(username, password)) {
         // If invalid login
-        print(separator);
+        printf(separator);
         goto start;
       }
       break;
