@@ -1,9 +1,6 @@
-csc411
-,mutuku,kyalo
+programming
+,
 
-dance
-,njagi
-
-science
-,njagi
+music
+,
 

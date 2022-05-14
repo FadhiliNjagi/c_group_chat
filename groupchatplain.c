@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct Message {
   char group_name[30];
@@ -64,8 +65,9 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       if (login(username, password)) {
-        // If invalid login				
-        goto login;
+        // If invalid login
+        print(separator);
+        goto start;
       }
       break;
     case 2:
