@@ -50,6 +50,7 @@ void load_group_messages();
 void update_users();
 void update_messages();
 void update_groups();
+void group_screen(char *username, char *group_name);
 
 int main() {
   int i, j;
@@ -96,8 +97,11 @@ int main() {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
       signup(temp1, temp2);
-    }
-    else {
+    } else if () (strcmp("/groupinfo", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      group_screen(temp1, temp2);
+    } else {
       strcpy(request, "Unrecognized request");
       send_response();
     }
@@ -299,4 +303,43 @@ void signup(char *username, char *password) {
   snprintf(response, sizeof(response), "OK\n%s", username);
   send_response();
   return;
+}
+
+void group_screen(char *username, char *group_name) {
+  int i, j, flag, group_index = -1;
+  char buffer[256];
+  // Check if group exists
+  for (i = 0; i < groups_no; i++) {
+    if (strcmp(groups[i].name, group_name) == 0) {
+      group_index = i;
+      break;
+    }
+  }
+  if (group_index == -1) {
+    snprintf(response, sizeof(response), "FAIL");
+    send_response();
+    return;
+  }
+  // Check if current user is a member
+  for (i = 0; i < 10; i++) {
+    if (strcmp(groups[group_index].members[i], username) == 0) {
+      snprintf(response, sizeof(response), "OK\nIs member\n");
+      for (j = 0; j < 10; j++) {
+        if (j > 0)
+          strcat(response, ", ");
+        strcat(response, groups[group_index].members[j]);
+      }
+      strcat(response, "\n");
+      for (j = 0; j < groups[group_index].messages_no; j++) {
+        // Output formatted message to buffer
+        snprintf(buffer, sizeof(buffer), "[%s] %s > %s\n", groups[group_index].messages[j].sender, groups[group_index].messages[j].sent_at, groups[group_index].messages[j].message);
+        // Apend to response
+        strcat(response, buffer);
+      }
+      send_response();
+      return;
+    }
+  }
+  snprintf(response, sizeof(response), "OK\nNot a member");
+  send_response();
 }
