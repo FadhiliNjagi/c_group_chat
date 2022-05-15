@@ -48,7 +48,7 @@ const char s[2] = "\n";
 void load_data();
 void send_response();
 void login(char *username, char *password, int socket);
-void signup(char *username, char *password, , int socket);
+void signup(char *username, char *password, int socket);
 void load_group_messages();
 void update_users();
 void update_messages();
@@ -90,8 +90,7 @@ int main() {
     client_socket = accept(server_socket, NULL, NULL);
     printf("[+] Incoming connection. Creating new thread...\n");
     // Create slave thread to handle request
-    pthread_create(&tid, NULL, handle_connection, &client_socket);
-    
+    pthread_create(&tid, NULL, &handle_connection, &client_socket);
   }
 
   return 0;
