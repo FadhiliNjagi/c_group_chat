@@ -136,7 +136,9 @@ int main() {
       if (strcmp("OK", token) == 0) {
         printf("The group '%s' has been created successfully\n", temp);
         if (chat_screen(temp)) {
-        // If user exits chatscreen
+          // If user exits chatscreen
+          goto Mainmenu;
+        }
       } else {
         printf("Error creating group");
       }
@@ -208,8 +210,7 @@ int chat_screen(char *group_name) {
         printf("Invalid choice.\n");
         goto join;
       }
-    }
-    else {
+    } else {
       printf("Group members: %s", strtok(NULL, s));
       while(token != NULL) {
         printf("%s", token);
