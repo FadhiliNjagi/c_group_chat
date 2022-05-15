@@ -13,18 +13,20 @@
 #include <unistd.h> // Close function
 
 // Global variables
-int network_socket, response_status;
+int network_socket;
 struct sockaddr_in server_address;
-char request[256], response[256];
+char request[256], response[256], logged_in_user[30];
 char separator[] = "---------------------------------------------------\n";
+const char s[2] = "\n";
 
 // Function prototypes
 void connect_to_server();
-int send_request();
+void send_request();
 
 int main() {
   int i, j, flag;
   char username[30], password[30], temp[30], choice_str[4];
+  char *token;
   printf("--------Chat Application--------\n");
   connect_to_server();
   start:
@@ -39,10 +41,16 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/login\n%s\n%s", username, password);
-      response_status = send_request();
-      printf("%s", response);
-      if (response_status) {
+      send_request();
+      // Process response
+      token = strtok(response, s);
+      if (strcmp("OK", token) == 0) {
+        logged_in_user = strtok(NULL, s);
+        printf("Login successful. Welcome %s!", logged_in_user);
+      }
+      else {
         // If invalid login
+        printf("\nInvalid credentials. Please try again.\n");
         printf(separator);
         goto start;
       }
@@ -55,10 +63,15 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/signup\n%s\n%s", username, password);
-      response_status = send_request();
-      printf("%s", response);
-      if (response_status) {
+      send_request();
+      // Process response
+      token = strtok(response, s);
+      if (strcmp("OK", token) == 0) {
+        logged_in_user = strtok(NULL, s);
+        printf("User created successfully. Welcome %s!\n", logged_in_user);
+      } else {
         // If signup error
+        printf("\nUsername is already taken.\n");
         goto signup;
       }
       break;
@@ -99,12 +112,11 @@ void connect_to_server() {
   printf("[+] Connected to the server successfully.\n");
 }
 
-int send_request() {
+void send_request() {
   // Sending request
   send(network_socket, request, sizeof(request), 0);
   // Receive response
   recv(network_socket, &response, sizeof(response), 0);
-  // @ToDo - Process receive status
   return 0;
 }
 
