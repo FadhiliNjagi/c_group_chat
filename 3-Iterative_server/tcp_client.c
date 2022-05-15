@@ -29,6 +29,7 @@ int main() {
   set_server_address();
   printf("--------Chat Application--------\n");
   start:
+  printf(separator);
   printf("Select an option to continue.\n\n1. Log in\n2. Sign Up\n\nChoice: ");
   scanf(" %[^\n]s", choice_str);
   switch (atoi(choice_str)) {

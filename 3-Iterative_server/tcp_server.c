@@ -84,16 +84,14 @@ int main() {
     printf("[+] Incoming connection.\n");
     // Receive request
     recv(client_socket, &request, sizeof(request), 0);
-    // Process request
+    // @ToDo remove this
     printf("[+] Request: %s\n", request);
     // Get request type
     token = strtok(request, s);
     if (strcmp("/login", token) == 0) {
-      snprintf(response, sizeof(response), "FAIL");
-      send_response();
-      // strcpy(temp1, strtok(NULL, s));
-      // strcpy(temp2, strtok(NULL, s));
-      // login(temp1, temp2);
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      login(temp1, temp2);
     }
     else {
       strcpy(request, "Unrecognized request");
