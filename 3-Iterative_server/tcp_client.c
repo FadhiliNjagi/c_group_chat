@@ -171,7 +171,7 @@ void send_request() {
   send(network_socket, request, sizeof(request), 0);
   // Receive response
   recv(network_socket, &response, sizeof(response), 0);
-  printf("[+] Response: %s\n", response);
+  //printf("[+] Response: %s\n", response);
   close(network_socket);
 }
 
@@ -188,7 +188,7 @@ int chat_screen(char *group_name) {
   } else if (strcmp("OK", token) == 0) {
     token = strtok(NULL, s);
     printf("---- Chat screen: Group '%s' ----\n\n", group_name);
-    if (strcmp("Not a member", token)) {
+    if (strcmp("Not a member", token) == 0) {
       join:
       printf("You are not a member of this group.\nJoin group? (y for yes, n to go back): ");
       scanf(" %[^\n]s", message);
