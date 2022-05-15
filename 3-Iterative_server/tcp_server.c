@@ -56,7 +56,7 @@ void leave_group(char *username, char *group_name);
 void group_list(char *username);
 void send_message(char *username, char *group_name, char *message);
 char *get_time();
-create_group(char *group_name);
+void create_group(char *group_name);
 
 int main() {
   int i, j;

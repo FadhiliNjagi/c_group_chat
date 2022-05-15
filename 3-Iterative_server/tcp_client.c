@@ -177,7 +177,7 @@ int chat_screen(char *group_name) {
   int i, j, flag;
   char message[160], *token;
   chatscreen:
-  snprintf(request, sizeof(request), "/groupinfo\n%s\n%s", logged_in_user, temp);
+  snprintf(request, sizeof(request), "/groupinfo\n%s\n%s", logged_in_user, group_name);
   send_request();
   token = strtok(response, s);
   if (strcmp("FAIL", token) == 0) {
