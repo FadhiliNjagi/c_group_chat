@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h> // Socket addresses
+#include <arpa/inet.h>
 #include <unistd.h> // Close function
 
 int main() {
