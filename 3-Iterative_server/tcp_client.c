@@ -20,7 +20,7 @@ char separator[] = "---------------------------------------------------\n";
 
 // Function prototypes
 void connect_to_server();
-int send_request(char *request);
+int send_request();
 
 int main() {
   int i, j, flag;
@@ -39,7 +39,7 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/login\n%s\n%s", username, password);
-      response_status = send_request(request);
+      response_status = send_request();
       printf("%s", response);
       if (response_status) {
         // If invalid login
@@ -55,7 +55,7 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/signup\n%s\n%s", username, password);
-      response_status = send_request(request);
+      response_status = send_request();
       printf("%s", response);
       if (response_status) {
         // If signup error
@@ -99,7 +99,7 @@ void connect_to_server() {
   printf("[+] Connected to the server successfully.\n");
 }
 
-int send_request(char *request) {
+int send_request() {
   // Sending request
   send(network_socket, request, sizeof(request), 0);
   // Receive response
