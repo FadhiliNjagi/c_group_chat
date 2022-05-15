@@ -104,7 +104,6 @@ int main() {
       snprintf(request, sizeof(request), "/grouplist\n%s", logged_in_user);
       send_request();
       // Process response
-      printf("%s", response);
       token = strtok(response, s);
       if (strcmp("OK", token) != 0) {
         printf("Error displaying groups list.\n");
@@ -113,7 +112,7 @@ int main() {
       token = strtok(NULL, s);
       printf("----- GROUPS LIST ----\nSelect group to open\n\n");
       while (token != NULL) {
-        printf("%s", token);
+        printf("%s\n", token);
         token = strtok(NULL, s);
       }
       printf("\nGroup Name (0 to go back): ");
