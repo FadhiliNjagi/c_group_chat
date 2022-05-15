@@ -20,7 +20,7 @@ char separator[] = "---------------------------------------------------\n";
 const char s[2] = "\n";
 
 // Function prototypes
-void connect_to_server();
+void create_socket();
 void send_request();
 
 int main() {
@@ -28,7 +28,7 @@ int main() {
   char username[30], password[30], temp[30], choice_str[4];
   char *token;
   printf("--------Chat Application--------\n");
-  connect_to_server();
+  create_socket();
   start:
   printf("Select an option to continue.\n\n1. Log in\n2. Sign Up\n\nChoice: ");
   scanf(" %[^\n]s", choice_str);
@@ -99,27 +99,26 @@ int main() {
   return 0;
 }
 
-void connect_to_server() {
+void create_socket() {
   // Create socket
   network_socket = socket(AF_INET, SOCK_STREAM, 0);
   // Specify address and port
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9002); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface on local machine
-  // Connect to a socket
+}
+
+void send_request() {
+  // Connect to server
   if (connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
     printf("Error connecting to server.\n");
     exit(1);
   }
-  printf("[+] Connected to the server successfully.\n");
-}
-
-void send_request() {
   // Sending request
   send(network_socket, request, sizeof(request), 0);
   // Receive response
   recv(network_socket, &response, sizeof(response), 0);
-  return 0;
+  close(network_socket);
 }
 
 // int chat_screen(char *group_name) {
