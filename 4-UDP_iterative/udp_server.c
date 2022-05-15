@@ -69,12 +69,12 @@ int main() {
   load_group_messages();
 
   // Create a socket
-  server_socket = socket(AF_INET, SOCK_STREAM, 0);
+  server_socket = socket(AF_INET, SOCK_DGRAM, 0);
 
   // Specifying address
   struct sockaddr_in server_address;
   server_address.sin_family = AF_INET; // IPv4
-  server_address.sin_port = htons(9002); // Port 9002 to correct byte order
+  server_address.sin_port = htons(9003); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface on local machine
 
   // Bind socket to port (Because we are receiing data)
@@ -127,8 +127,6 @@ int main() {
       strcpy(request, "Unrecognized request");
       send_response();
     }
-    // Close connection
-    close(client_socket);
   }
 
   return 0;

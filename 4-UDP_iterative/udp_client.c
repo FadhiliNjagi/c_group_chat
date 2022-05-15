@@ -158,7 +158,7 @@ int main() {
 void set_server_address() {
   // Specify address and port
   server_address.sin_family = AF_INET; // IPv4
-  server_address.sin_port = htons(9002); // Port 9002 to correct byte order
+  server_address.sin_port = htons(9003); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface on local machine
 }
 
