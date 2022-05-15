@@ -51,6 +51,11 @@ void update_users();
 void update_messages();
 void update_groups();
 void group_screen(char *username, char *group_name);
+void join_group(char *username, char *group_name);
+void leave_group(char *username, char *group_name);
+void group_list(char *username);
+void send_message(char *username, char *group_name, char *message);
+char *get_time();
 
 int main() {
   int i, j;
@@ -101,6 +106,25 @@ int main() {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
       group_screen(temp1, temp2);
+    } else if (strcmp("/grouplist", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      group_list(temp1);
+    } else if (strcmp("/joingroup", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      join_group(temp1, temp2);
+    } else if (strcmp("/leavegroup", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      leave_group(temp1, temp2);
+    } else if (strcmp("/creategroup", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      create_group(temp1);
+    } else if (strcmp("/message", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      strcpy(buffer, strtok(NULL, s));
+      send_message(temp1, temp2, buffer);
     } else {
       strcpy(request, "Unrecognized request");
       send_response();
@@ -341,5 +365,149 @@ void group_screen(char *username, char *group_name) {
     }
   }
   snprintf(response, sizeof(response), "OK\nNot a member");
+  send_response();
+}
+
+void join_group(char *username, char *group_name) {
+  int i, j, index = -1;
+  for (i = 0; i < groups_no; i++) {
+    if (strcmp(groups[i].name, group_name) == 0) {
+      index = i;
+      break;
+    }
+  }
+  if (index = -1) {
+    snprintf(response, sizeof(response), "FAIL\nGroup not found");
+    send_response();
+    return;
+  }
+  for (j = 0; j < 10; j++) {
+    if (strlen(groups[index].members[j]) == 0) {
+      strcpy(groups[index].members[j], username);
+      update_groups();
+      snprintf(response, sizeof(response), "OK");
+      send_response();
+      return;
+    }
+  }
+  snprintf(response, sizeof(response), "FAIL\nGroup is full");
+  send_response();
+}
+
+void leave_group(char *username, char *group_name) {
+  int i, j, index = -1;
+  for (i = 0; i < groups_no; i++) {
+    if (strcmp(groups[i].name, group_name) == 0) {
+      index = i;
+      break;
+    }
+  }
+  if (index = -1) {
+    snprintf(response, sizeof(response), "FAIL\nGroup not found");
+    send_response();
+    return;
+  }
+  // Find current user and delete
+  for (i = 0; i < 10; i++) { // Iterate thru members
+    if (strcmp(groups[index].members[i], username) == 0) {
+      for (j = i; j < 9; j++) { // Delete by shifting
+        strcpy(groups[index].members[j], groups[index].members[j + 1]);
+      }
+      strcpy(groups[index].members[9], "");
+      update_groups();
+      snprintf(response, sizeof(response), "OK");
+      send_response();
+      return;
+    }
+  }
+  snprintf(response, sizeof(response), "FAIL\nYou are not a member of the group.");
+  send_response();
+  return;
+}
+
+void group_list(char *username) {
+  int i, j, flag;
+  char buffer[256];
+  snprintf(response, sizeof(response), "[+] Joined Groups\n");
+  for (i = 0; i < groups_no; i++) {
+    for (j = 0; j < 10; j++) {
+      if (strcmp(groups[i].members[j], username) == 0)
+        snprintf(buffer, sizeof(buffer), "> %s\n", groups[i].name);
+        strcat(response, buffer);
+    }
+  }
+  strcat("\n[+] Unjoined Groups\n");
+  for (i = 0; i < groups_no; i++) {
+    flag = 0;
+    // Check if the logged in user is a member
+    for (j = 0; j < 10; j++) {
+      if (strcmp(groups[i].members[j], username) == 0) {
+        flag = 1;
+      }
+    }
+    if (flag == 0) {
+      snprintf(buffer, sizeof(buffer), "> %s\n", groups[i].name);
+      strcat(response, buffer);
+    }
+  }
+  send_response();
+}
+
+void send_message(char *username, char *group_name, char *message) {
+  int i, j, index = -1;
+  for (i = 0; i < groups_no; i++) {
+    if (strcmp(groups[i].name, group_name) == 0) {
+      index = i;
+      break;
+    }
+  }
+  if (index = -1) {
+    snprintf(response, sizeof(response), "FAIL\nGroup not found");
+    send_response();
+    return;
+  }
+  // Construct message
+  strcpy(messages[messages_no].group_name, group_name);
+  strcpy(messages[messages_no].message, message);
+  strcpy(messages[messages_no].sender, username);
+  strcpy(messages[messages_no].sent_at, get_time());
+  messages_no++;
+
+  // Save to group
+  strcpy(groups[i].messages[groups[i].messages_no].group_name, group_name);
+  strcpy(groups[i].messages[groups[i].messages_no].message, message);
+  strcpy(groups[i].messages[groups[i].messages_no].sender, username);
+  strcpy(groups[i].messages[groups[i].messages_no].sent_at, get_time());
+  groups[i].messages_no++;
+
+  update_messages();
+  snprintf(response, sizeof(response), "OK");
+  send_response();
+}
+
+char *get_time() {
+  char *pts; /* pointer to time string */
+	time_t now; /* current time */
+	char *ctime();
+	(void) time(&now);
+  char *result = ctime(&now);
+  if (result[strlen(result)-1] == '\n' )
+    result[strlen(result)-1] = 0;
+  return result;
+}
+
+void create_group(char *group_name) {
+  int i;
+  for (i = 0; i < groups_no; i++) {
+    if (groups[i].name == group_name) {
+      snprintf(response, sizeof(response), "FAIL\nGroup already exists.");
+      send_response();
+      return;
+    }
+  }
+  strcpy(groups[groups_no].name, group_name);
+  groups_no++;
+  update_groups();
+  snprintf(response, sizeof(response), "OK");
   send_response();
 }
