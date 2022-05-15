@@ -27,7 +27,7 @@ int main() {
   
   // Connect to a socket
   if (connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
-    printf("Error connecting to server");
+    printf("Error connecting to server.\n");
     exit(1);
   }
   printf("[+] Connected to the server successfully.\n");
