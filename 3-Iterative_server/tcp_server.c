@@ -55,6 +55,7 @@ int main() {
   int client_socket, i, j;
   char *token;
   const char s[2] = "\n";
+  char temp1[30], temp2[30], buffer[160];
 
   // Load data
   load_data();
@@ -88,7 +89,9 @@ int main() {
     // Get request type
     token = strtok(request, s);
     if (strcmp("/login", token) == 0) {
-      login(strtok(NULL, s), strtok(NULL, s));
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      login(temp1, temp2);
     }
     // Close connection
     close(client_socket);
