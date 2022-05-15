@@ -37,7 +37,7 @@ User users[20];
 Message messages[100];
 Group groups[20];
 int users_no = 0, messages_no = 0, groups_no = 0;
-int server_socket;
+int server_socket, client_socket;
 struct sockaddr_in server_address;
 char request[256], response[256];
 
@@ -52,7 +52,7 @@ void update_messages();
 void update_groups();
 
 int main() {
-  int client_socket, i, j;
+  int i, j;
   char *token;
   const char s[2] = "\n";
   char temp1[30], temp2[30], buffer[160];
@@ -262,7 +262,7 @@ void update_groups() {
 
 void send_response() {
   // Sending response
-  send(server_socket, request, sizeof(request), 0);
+  send(client_socket, response, sizeof(response), 0);
 }
 
 void login(char *username, char *password) {
@@ -276,7 +276,6 @@ void login(char *username, char *password) {
     }
   }
   snprintf(response, sizeof(response), "FAIL");
-  printf("[+] Response: %s", response);
   send_response();
   return;
 }
