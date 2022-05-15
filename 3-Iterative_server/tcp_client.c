@@ -105,13 +105,15 @@ int main() {
       send_request();
       // Process response
       token = strtok(response, s);
-      if (strcmp("OK", token) == 0) {
+      if (strcmp("OK", token) != 0) {
+        printf("Error displaying groups list.\n");
+        goto Mainmenu;
+      }
+      token = strtok(NULL, s);
+      printf("----- GROUPS LIST ----\nSelect group to open\n\n");
+      while (token != NULL) {
+        printf("%s", token);
         token = strtok(NULL, s);
-        printf("----- GROUPS LIST ----\nSelect group to open\n\n");
-        while (token != NULL) {
-          printf("%s", token);
-          token = strtok(NULL, s);
-        }
       }
       printf("\nGroup Name (0 to go back): ");
       scanf(" %[^\n]s", temp);
