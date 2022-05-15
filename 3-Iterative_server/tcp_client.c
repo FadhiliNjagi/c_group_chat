@@ -104,6 +104,7 @@ int main() {
       snprintf(request, sizeof(request), "/grouplist\n%s", logged_in_user);
       send_request();
       // Process response
+      printf("%s", response);
       token = strtok(response, s);
       if (strcmp("OK", token) != 0) {
         printf("Error displaying groups list.\n");
@@ -213,7 +214,7 @@ int chat_screen(char *group_name) {
         goto join;
       }
     } else {
-      printf("Group members: %s\n\n", strtok(NULL, s));
+      printf("\nGroup members: %s\n\n", strtok(NULL, s));
       token = strtok(NULL, s);
       while(token != NULL) {
         printf("%s", token);

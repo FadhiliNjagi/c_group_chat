@@ -88,11 +88,9 @@ int main() {
   while (1) {
     // Accept incoming client connections
     client_socket = accept(server_socket, NULL, NULL);
-    printf("[+] Incoming connection.\n");
+    printf("[+] Incoming connection. Processing request...\n");
     // Receive request
     recv(client_socket, &request, sizeof(request), 0);
-    // @ToDo remove this
-    printf("[+] Request: %s\n", request);
     // Get request type
     token = strtok(request, s);
     if (strcmp("/login", token) == 0) {
@@ -431,7 +429,7 @@ void leave_group(char *username, char *group_name) {
 void group_list(char *username) {
   int i, j, flag;
   char buffer[256];
-  strcpy(response, "[+] Joined Groups\n");
+  strcpy(response, "OK\n[+] Joined Groups\n");
   for (i = 0; i < groups_no; i++) {
     for (j = 0; j < 10; j++) {
       if (strcmp(groups[i].members[j], username) == 0)
