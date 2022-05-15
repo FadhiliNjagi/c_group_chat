@@ -15,7 +15,7 @@
 
 int main() {
   int server_socket;
-  char response[256] = "Hello, I'm the server. If you are getting this, the connection was successful";
+  char response[256] = "Hello, I'm the TCP server. If you are getting this, the connection was successful", request[256];
 
   // Create a socket
   server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -24,7 +24,7 @@ int main() {
   struct sockaddr_in server_address;
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9002); // Port 9002 to correct byte order
-  server_address.sin_addr.s_addr = INADDR_ANY; // Any interface IP on local machine
+  server_address.sin_addr.s_addr = "127.0.0.1"; // Localhost
 
   // Bind socket to address
   bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
@@ -36,11 +36,18 @@ int main() {
   // Accept incoming client connections
   int client_socket;
   client_socket = accept(server_socket, NULL, NULL);
-  printf("[+] Incoming connection. Sending data...\n");
+  printf("[+] Incoming connection.\n");
 
-  // Send data
+  // Receive request
+  recv(client_socket, &request, sizeof(request), 0);
+
+  // Processing request
+  printf("[+] Request: %s\n", request);
+
+  // Send response
   send(client_socket, response, sizeof(response), 0);
+  printf("[+] Sending response...\n");
 
-  // Close server socket
+  // Close connection
   close(server_socket);
 }

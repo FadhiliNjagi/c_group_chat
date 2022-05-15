@@ -23,7 +23,7 @@ int main() {
   struct sockaddr_in server_address, client_address;
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9003); // Port 9002 to correct byte order
-  server_address.sin_addr.s_addr = INADDR_ANY; // Any interface IP on local machine
+  server_address.sin_addr.s_addr = "127.0.0.1"; // Localhost
 
   printf("[+] Waiting for client requests...\n");
 
@@ -37,6 +37,8 @@ int main() {
 
   // Receive request
   recvfrom(server_socket, request, sizeof(request), MSG_WAITALL, (struct sockaddr *) &client_address, &client_addr_size);
+
+  // Processing request
   printf("[+] Request: %s\n", request);
 
   // Send response
