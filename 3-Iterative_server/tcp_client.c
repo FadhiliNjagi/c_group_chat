@@ -112,6 +112,7 @@ void send_request() {
   send(network_socket, request, sizeof(request), 0);
   // Receive response
   recv(network_socket, &response, sizeof(response), 0);
+  printf("[+] Response: %s\n", response);
   close(network_socket);
 }
 
