@@ -195,7 +195,7 @@ int chat_screen(char *group_name) {
       if (strcmp(message, "n") == 0)
         return 1;
       else if (strcmp(message, "y") == 0) {
-        snprintf(request, sizeof(request), "/joingroup\n%s\n%s", username, temp);
+        snprintf(request, sizeof(request), "/joingroup\n%s\n%s", logged_in_user, group_name);
         send_request();
         // Process response
         token = strtok(response, s);
