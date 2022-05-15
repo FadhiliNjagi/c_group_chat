@@ -101,7 +101,7 @@ int main() {
     case 2:
       groups_list:
       printf(separator);
-      snprintf(request, sizeof(request), "/grouplist\n%s", username);
+      snprintf(request, sizeof(request), "/grouplist\n%s", logged_in_user);
       send_request();
       // Process response
       token = strtok(response, s);
@@ -221,7 +221,7 @@ int chat_screen(char *group_name) {
       if (strcmp(message, "0") == 0) {
         return 1;
       } else if (strcmp(message, "/exit") == 0) {
-        snprintf(request, sizeof(request), "/leavegroup\n%s\n%s", username, group_name);
+        snprintf(request, sizeof(request), "/leavegroup\n%s\n%s", logged_in_user, group_name);
         send_request();
         // Process response
         token = strtok(response, s);
@@ -231,7 +231,7 @@ int chat_screen(char *group_name) {
           printf("%s\n", strtok(NULL, s));
         return 1;
       } else {
-        snprintf(request, sizeof(request), "/message\n%s\n%s\n%s", username, group_name, message);
+        snprintf(request, sizeof(request), "/message\n%s\n%s\n%s", logged_in_user, group_name, message);
         send_request();
         // Process response
         token = strtok(response, s);
