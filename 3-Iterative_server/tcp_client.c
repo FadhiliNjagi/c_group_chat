@@ -13,14 +13,14 @@
 #include <unistd.h> // Close function
 
 // Global variables
-int network_socket;
-int response_status = 0;
+int network_socket, response_status;
 struct sockaddr_in server_address;
-char request[256];
+char request[256], response[256];
+char separator[] = "---------------------------------------------------\n";
 
 // Function prototypes
 void connect_to_server();
-char *send_request(char *request);
+int send_request(char *request);
 
 int main() {
   int i, j, flag;
@@ -39,7 +39,8 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/login\n%s\n%s", username, password);
-      printf("%s", send_request(request));
+      response_status = send_request(request);
+      printf("%s", response);
       if (response_status) {
         // If invalid login
         printf(separator);
@@ -54,7 +55,8 @@ int main() {
       printf("Password: ");
       scanf(" %[^\n]s", password);
       snprintf(request, sizeof(request), "/signup\n%s\n%s", username, password);
-      printf("%s", send_request(request));
+      response_status = send_request(request);
+      printf("%s", response);
       if (response_status) {
         // If signup error
         goto signup;
@@ -97,14 +99,13 @@ void connect_to_server() {
   printf("[+] Connected to the server successfully.\n");
 }
 
-char *send_request(char *request) {
-  char response[256];
+int send_request(char *request) {
   // Sending request
   send(network_socket, request, sizeof(request), 0);
   // Receive response
   recv(network_socket, &response, sizeof(response), 0);
   // @ToDo - Process receive status
-  return response;
+  return 0;
 }
 
 // int chat_screen(char *group_name) {
