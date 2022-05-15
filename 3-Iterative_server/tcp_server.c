@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 
 // Socket libraries
 #include <sys/types.h>
@@ -43,8 +44,8 @@ char request[256], response[256];
 // Function protoypes
 void load_data();
 void send_response();
-int login(char *username, char *password);
-int signup(char *username, char *password);
+void login(char *username, char *password);
+void signup(char *username, char *password);
 void load_group_messages();
 void update_users();
 void update_messages();
@@ -252,32 +253,32 @@ void update_groups() {
 
 void send_response() {
   // Sending response
-  send(network_socket, request, sizeof(request), 0);
+  send(server_socket, request, sizeof(request), 0);
 }
 
-int login(char *username, char *password) {
+void login(char *username, char *password) {
   /* Check for matching username, password pair */
   int i;
   for (i = 0; i < users_no; i++) {
     if ((strcmp(users[i].username, username) == 0) && (strcmp(users[i].password, password) == 0)) {
       snprintf(response, sizeof(response), "OK\n%s", username);
       send_response();
-      return 0;
+      return;
     }
   }
   snprintf(response, sizeof(response), "FAIL");
   send_response();
-  return 0;
+  return;
 }
 
-int signup(char *username, char *password) {
+void signup(char *username, char *password) {
   int i;
   // Check if username is available
   for (i = 0; i < users_no; i++) {
     if (strcmp(users[i].username, username) == 0) {
       snprintf(response, sizeof(response), "FAIL");
       send_response();
-      return 0;
+      return;
     }
   }
   strcpy(users[users_no].username, username);
@@ -286,5 +287,5 @@ int signup(char *username, char *password) {
   update_users();
   snprintf(response, sizeof(response), "OK\n%s", username);
   send_response();
-  return 0;
+  return;
 }

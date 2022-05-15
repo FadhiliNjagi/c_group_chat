@@ -45,7 +45,8 @@ int main() {
       // Process response
       token = strtok(response, s);
       if (strcmp("OK", token) == 0) {
-        logged_in_user = strtok(NULL, s);
+        token = strtok(NULL, s);
+        strcpy(logged_in_user, token);
         printf("Login successful. Welcome %s!", logged_in_user);
       }
       else {
@@ -67,7 +68,8 @@ int main() {
       // Process response
       token = strtok(response, s);
       if (strcmp("OK", token) == 0) {
-        logged_in_user = strtok(NULL, s);
+        token = strtok(NULL, s);
+        strcpy(logged_in_user, token);
         printf("User created successfully. Welcome %s!\n", logged_in_user);
       } else {
         // If signup error
