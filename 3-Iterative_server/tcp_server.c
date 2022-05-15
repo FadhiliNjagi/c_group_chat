@@ -89,9 +89,15 @@ int main() {
     // Get request type
     token = strtok(request, s);
     if (strcmp("/login", token) == 0) {
-      strcpy(temp1, strtok(NULL, s));
-      strcpy(temp2, strtok(NULL, s));
-      login(temp1, temp2);
+      snprintf(response, sizeof(response), "FAIL");
+      send_response();
+      // strcpy(temp1, strtok(NULL, s));
+      // strcpy(temp2, strtok(NULL, s));
+      // login(temp1, temp2);
+    }
+    else {
+      strcpy(request, "Unrecognized request");
+      send_response();
     }
     // Close connection
     close(client_socket);
