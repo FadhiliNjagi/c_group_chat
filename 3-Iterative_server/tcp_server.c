@@ -56,6 +56,7 @@ void leave_group(char *username, char *group_name);
 void group_list(char *username);
 void send_message(char *username, char *group_name, char *message);
 char *get_time();
+create_group(char *group_name);
 
 int main() {
   int i, j;
@@ -436,7 +437,7 @@ void group_list(char *username) {
         strcat(response, buffer);
     }
   }
-  strcat("\n[+] Unjoined Groups\n");
+  strcat(response, "\n[+] Unjoined Groups\n");
   for (i = 0; i < groups_no; i++) {
     flag = 0;
     // Check if the logged in user is a member

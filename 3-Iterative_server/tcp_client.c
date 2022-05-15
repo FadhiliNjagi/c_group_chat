@@ -21,6 +21,7 @@ struct sockaddr_in server_address;
 // Function prototypes
 void send_request();
 void set_server_address();
+int chat_screen(char *group_name);
 
 int main() {
   int i, j, flag;
@@ -211,7 +212,7 @@ int chat_screen(char *group_name) {
     else {
       printf("Group members: %s", strtok(NULL, s));
       while(token != NULL) {
-        printf("%s", token)
+        printf("%s", token);
         token = strtok(NULL, s);
       }
       printf("\nEnter message (0 to go back, /exit to leave group): ");
@@ -223,12 +224,10 @@ int chat_screen(char *group_name) {
         send_request();
         // Process response
         token = strtok(response, s);
-        if (strcmp("OK", token) == 0) {
+        if (strcmp("OK", token) == 0)
           printf("Left group successfully.\n");
-        }
-        else {
+        else
           printf("%s\n", strtok(NULL, s));
-        }
         return 1;
       } else {
         snprintf(request, sizeof(request), "/message\n%s\n%s\n%s", username, group_name, message);
@@ -236,7 +235,7 @@ int chat_screen(char *group_name) {
         // Process response
         token = strtok(response, s);
         if (strcmp("OK", token) == 0) {
-          goto chat_screen;
+          goto chatscreen;
         }
         else {
           printf("%s\n", strtok(NULL, s));
