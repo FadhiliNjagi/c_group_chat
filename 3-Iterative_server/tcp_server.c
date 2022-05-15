@@ -432,9 +432,11 @@ void group_list(char *username) {
   strcpy(response, "OK\n[+] Joined Groups\n");
   for (i = 0; i < groups_no; i++) {
     for (j = 0; j < 10; j++) {
-      if (strcmp(groups[i].members[j], username) == 0)
+      if (strcmp(groups[i].members[j], username) == 0) {
         snprintf(buffer, sizeof(buffer), "> %s\n", groups[i].name);
         strcat(response, buffer);
+        break;
+      }
     }
   }
   strcat(response, "\n[+] Unjoined Groups\n");
