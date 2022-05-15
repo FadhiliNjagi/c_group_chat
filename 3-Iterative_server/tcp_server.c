@@ -92,6 +92,10 @@ int main() {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
       login(temp1, temp2);
+    } else if (strcmp("/signup", token) == 0) {
+      strcpy(temp1, strtok(NULL, s));
+      strcpy(temp2, strtok(NULL, s));
+      signup(temp1, temp2);
     }
     else {
       strcpy(request, "Unrecognized request");
