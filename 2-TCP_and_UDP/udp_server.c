@@ -25,12 +25,13 @@ int main() {
   server_address.sin_port = htons(9003); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface IP on local machine
 
-  // Bind socket to port
+  printf("[+] Waiting for client requests...\n");
+
+  // Bind socket to port (Because we are receiing data)
   if (bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
     printf("Failed to bind socket to port 9003.\n");
     exit(1);
   }
-  printf("[+] Waiting for client requests...");
 
   socklen_t client_addr_size = sizeof(client_address);
 
