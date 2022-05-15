@@ -40,6 +40,7 @@ int main() {
       send_request();
       // Process response
       token = strtok(response, s);
+      printf("Reached here");
       if (strcmp("OK", token) == 0) {
         token = strtok(NULL, s);
         strcpy(logged_in_user, token);
