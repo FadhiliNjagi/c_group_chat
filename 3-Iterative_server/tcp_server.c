@@ -350,9 +350,11 @@ void group_screen(char *username, char *group_name) {
     if (strcmp(groups[group_index].members[i], username) == 0) {
       snprintf(response, sizeof(response), "OK\nIs member\n");
       for (j = 0; j < 10; j++) {
-        if (j > 0)
-          strcat(response, ", ");
-        strcat(response, groups[group_index].members[j]);
+        if (strlen(groups[group_index].members[j]) > 0) {
+          if (j > 0)
+            strcat(response, ", ");
+          strcat(response, groups[group_index].members[j]);
+        }
       }
       strcat(response, "\n");
       for (j = 0; j < groups[group_index].messages_no; j++) {
@@ -429,7 +431,7 @@ void leave_group(char *username, char *group_name) {
 void group_list(char *username) {
   int i, j, flag;
   char buffer[256];
-  snprintf(response, sizeof(response), "[+] Joined Groups\n");
+  strcpy(response, "[+] Joined Groups\n");
   for (i = 0; i < groups_no; i++) {
     for (j = 0; j < 10; j++) {
       if (strcmp(groups[i].members[j], username) == 0)

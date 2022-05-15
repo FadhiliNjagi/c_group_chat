@@ -211,7 +211,8 @@ int chat_screen(char *group_name) {
         goto join;
       }
     } else {
-      printf("Group members: %s", strtok(NULL, s));
+      printf("Group members: %s\n\n", strtok(NULL, s));
+      token = strtok(NULL, s);
       while(token != NULL) {
         printf("%s", token);
         token = strtok(NULL, s);
