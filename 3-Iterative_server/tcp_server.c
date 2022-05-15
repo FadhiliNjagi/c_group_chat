@@ -97,7 +97,7 @@ int main() {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
       signup(temp1, temp2);
-    } else if () (strcmp("/groupinfo", token) == 0) {
+    } else if (strcmp("/groupinfo", token) == 0) {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
       group_screen(temp1, temp2);
