@@ -16,14 +16,17 @@
 char request[256], response[256], logged_in_user[30];
 char separator[] = "---------------------------------------------------\n";
 const char s[2] = "\n";
+struct sockaddr_in server_address;
 
 // Function prototypes
 void send_request();
+void set_server_address();
 
 int main() {
   int i, j, flag;
   char username[30], password[30], temp[30], choice_str[4];
   char *token;
+  set_server_address();
   printf("--------Chat Application--------\n");
   start:
   printf("Select an option to continue.\n\n1. Log in\n2. Sign Up\n\nChoice: ");
@@ -96,14 +99,16 @@ int main() {
   return 0;
 }
 
-void send_request() {
-  struct sockaddr_in server_address;
-  // Create socket
-  int network_socket = socket(AF_INET, SOCK_STREAM, 0);
+void set_server_address() {
   // Specify address and port
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9002); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface on local machine
+}
+
+void send_request() {
+  // Create socket
+  int network_socket = socket(AF_INET, SOCK_STREAM, 0);
   // Connect to server
   if (connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
     printf("Error connecting to server.\n");

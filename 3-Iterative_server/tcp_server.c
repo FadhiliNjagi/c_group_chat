@@ -270,6 +270,7 @@ void login(char *username, char *password) {
     }
   }
   snprintf(response, sizeof(response), "FAIL");
+  printf("[+] Response: %s", response);
   send_response();
   return;
 }
