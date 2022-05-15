@@ -216,7 +216,7 @@ int chat_screen(char *group_name) {
       printf("\nGroup members: %s\n\n", strtok(NULL, s));
       token = strtok(NULL, s);
       while(token != NULL) {
-        printf("%s", token);
+        printf("%s\n", token);
         token = strtok(NULL, s);
       }
       printf("\nEnter message (0 to go back, /exit to leave group): ");
