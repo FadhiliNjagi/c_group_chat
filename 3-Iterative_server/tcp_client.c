@@ -13,14 +13,11 @@
 #include <unistd.h> // Close function
 
 // Global variables
-int network_socket;
-struct sockaddr_in server_address;
 char request[256], response[256], logged_in_user[30];
 char separator[] = "---------------------------------------------------\n";
 const char s[2] = "\n";
 
 // Function prototypes
-void create_socket();
 void send_request();
 
 int main() {
@@ -28,7 +25,6 @@ int main() {
   char username[30], password[30], temp[30], choice_str[4];
   char *token;
   printf("--------Chat Application--------\n");
-  create_socket();
   start:
   printf("Select an option to continue.\n\n1. Log in\n2. Sign Up\n\nChoice: ");
   scanf(" %[^\n]s", choice_str);
@@ -99,16 +95,14 @@ int main() {
   return 0;
 }
 
-void create_socket() {
+void send_request() {
+  struct sockaddr_in server_address;
   // Create socket
-  network_socket = socket(AF_INET, SOCK_STREAM, 0);
+  int network_socket = socket(AF_INET, SOCK_STREAM, 0);
   // Specify address and port
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9002); // Port 9002 to correct byte order
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface on local machine
-}
-
-void send_request() {
   // Connect to server
   if (connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
     printf("Error connecting to server.\n");
