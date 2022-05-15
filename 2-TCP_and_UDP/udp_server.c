@@ -30,9 +30,10 @@ int main() {
     printf("Failed to bind socket to port 9003.\n");
     exit(1);
   }
+  socklen_t client_addr_size = sizeof(client_address);
 
   // Receive request
-  recvfrom(server_socket, request, sizeof(request), MSG_WAITALL, (struct sockaddr *) &client_address, sizeof(client_address));
+  recvfrom(server_socket, request, sizeof(request), MSG_WAITALL, (struct sockaddr *) &client_address, &client_addr_size);
   printf("[+] Request: %s\n", request);
 
   // Send response
@@ -40,5 +41,5 @@ int main() {
   printf("[+] Sending response.\n");
 
   // Closing server socket
-  close(server_socket)
+  close(server_socket);
 }

@@ -31,10 +31,12 @@ int main() {
 
   // Listen for connections
   listen(server_socket, 10); // Queue capacity of 10
+  printf("[+] Server is listening...\n");
 
   // Accept incoming client connections
   int client_socket;
   client_socket = accept(server_socket, NULL, NULL);
+  printf("[+] Incoming connection. Sending data...\n");
 
   // Send data
   send(client_socket, response, sizeof(response), 0);
