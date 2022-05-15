@@ -60,7 +60,7 @@ void group_list(char *username, int socket);
 void send_message(char *username, char *group_name, char *message, int socket);
 char *get_time();
 void create_group(char *group_name, int socket);
-void handle_connection();
+void *handle_connection();
 
 int main() {
   pthread_t tid;
@@ -96,7 +96,7 @@ int main() {
   return 0;
 }
 
-void handle_connection(void* arg) {
+void *handle_connection(void* arg) {
   int client = *(int*)arg;
   char *token;
   char temp1[30], temp2[30], buffer[160];
