@@ -24,7 +24,7 @@ int main() {
   struct sockaddr_in server_address;
   server_address.sin_family = AF_INET; // IPv4
   server_address.sin_port = htons(9003); // Port 9002 to correct byte order
-  server_address.sin_addr.s_addr = "127.0.0.1"; // Localhost
+  server_address.sin_addr.s_addr = inet_addr("127.0.0.1"); // Localhost
   
   // Send a request
   if(sendto(network_socket, request, sizeof(request), 0, (const struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
