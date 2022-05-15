@@ -27,7 +27,7 @@ int main() {
   server_address.sin_addr.s_addr = INADDR_ANY; // Any interface IP on local machine
   
   // Send a request
-  if(sendto(network_socket, request, strlen(request), 0, (const struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
+  if(sendto(network_socket, request, sizeof(request), 0, (const struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
     printf("Failed to send request.\n");
     exit(1);
   }
