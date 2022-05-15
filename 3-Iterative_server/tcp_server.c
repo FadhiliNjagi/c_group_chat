@@ -377,7 +377,7 @@ void join_group(char *username, char *group_name) {
       break;
     }
   }
-  if (index = -1) {
+  if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
     send_response();
     return;
@@ -403,7 +403,7 @@ void leave_group(char *username, char *group_name) {
       break;
     }
   }
-  if (index = -1) {
+  if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
     send_response();
     return;
@@ -462,7 +462,7 @@ void send_message(char *username, char *group_name, char *message) {
       break;
     }
   }
-  if (index = -1) {
+  if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
     send_response();
     return;
