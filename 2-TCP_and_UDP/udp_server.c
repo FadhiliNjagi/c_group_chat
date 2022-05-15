@@ -37,7 +37,7 @@ int main() {
   printf("[+] Request: %s\n", request);
 
   // Send response
-  sendto(server_socket, response, strlen(response), 0, (struct sockaddr *) &client_address, sizeof(client_address);
+  sendto(server_socket, response, strlen(response), 0, (struct sockaddr *) &client_address, sizeof(client_address));
   printf("[+] Sending response.\n");
 
   // Closing server socket
