@@ -65,10 +65,6 @@ int main() {
   char temp1[30], temp2[30], buffer[160];
   pid_t pid;
 
-  // Load data
-  load_data();
-  load_group_messages();
-
   // Create a socket
   server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -94,6 +90,9 @@ int main() {
       printf("New slave process created.\n");
       // Receive request
       recv(client_socket, &request, sizeof(request), 0);
+      // Load data
+      load_data();
+      load_group_messages();
       // Get request type
       token = strtok(request, s);
       printf("Request type: %s\n", token);

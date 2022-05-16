@@ -53,7 +53,6 @@ int main() {
       else {
         // If invalid login
         printf("\nInvalid credentials. Please try again.\n");
-        printf(separator);
         goto start;
       }
       break;
