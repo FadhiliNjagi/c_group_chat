@@ -82,6 +82,7 @@ int main() {
     printf("Failed to bind socket to port 9003.\n");
     exit(1);
   }
+  printf("[+] Waiting for requests...\n");
 
   socklen_t client_addr_size = sizeof(client_address);
 

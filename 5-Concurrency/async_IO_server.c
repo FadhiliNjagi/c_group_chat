@@ -165,7 +165,6 @@ void *handle_connection(int client) {
   }
   // Close connection
   close(client);
-  printf("[+] Thread is exiting\n");
 }
 
 void load_data() {
