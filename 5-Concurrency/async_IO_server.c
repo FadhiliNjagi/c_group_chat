@@ -63,7 +63,7 @@ void create_group(char *group_name, int socket);
 void *handle_connection(int client);
 
 int main() {
-  int i, max_sockets_so_far = 0;
+  int i;
   // Load data
   load_data();
   load_group_messages();
@@ -90,27 +90,23 @@ int main() {
   FD_ZERO(&current_sockets);
   // Add serer socket to current FD set
   FD_SET(server_socket, &current_sockets);
-  max_sockets_so_far = server_socket;
 
   // Master thread
   while (1) {
     // Copy current FD set bcoz select is destructive
     ready_sockets = current_sockets;
 
-    if (select(max_sockets_so_far, &ready_sockets, NULL, NULL, NULL) < 0) {
+    if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0) {
       printf("Select error.\n");
       exit(1);
     }
-    for (i = 0; i <= max_sockets_so_far; i++) {
+    for (i = 0; i < FD_SETSIZE; i++) {
       if (FD_ISSET(i, &ready_sockets)) {
         if (i == server_socket) {
           // Accept new connection
           client_socket = accept(server_socket, NULL, NULL);
           printf("[+] Accepting incoming connection.\n");
           FD_SET(client_socket, &current_sockets); // Add client socket to current FD set
-          if (client_socket > max_sockets_so_far) {
-            max_sockets_so_far = client_socket;
-          }
         } else {
           // Process request
           handle_connection(i);
