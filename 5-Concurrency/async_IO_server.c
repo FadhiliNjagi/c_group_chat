@@ -91,7 +91,6 @@ int main() {
   // Add serer socket to current FD set
   FD_SET(server_socket, &current_sockets);
 
-  // Master thread
   while (1) {
     // Copy current FD set bcoz select is destructive
     ready_sockets = current_sockets;
