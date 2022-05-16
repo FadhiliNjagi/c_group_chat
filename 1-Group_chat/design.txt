@@ -1,23 +1,27 @@
-1. create group
-2. my groups
-3. join an existing group
+1. Log in
+2. Signup
+-----------------------
 
--- 1
-Enter group name
-check if name is not taken
+1. Search for a group
+2. Group list
+3. Create a group
+-----------------------
 
--- 2
-List groups - select
-1. Send
-2. Leave group
-3. exist
-OR
-Send message (enter to go back, /exit to leave group):
+-- 1 (Search)
+- Enter group name
+If found, go to chat screen
 
--- 3
-List group - select
-enter group name
-join
-redirect to groups screen/specific group screen
+-- 2 (Group list)
+List of groups, joined and unjoined
+- Enter group name
+If found, go to chat screen
 
+-- 3 (Create group)
+- Enter group name
+If not existing, create and go to chat screen
 
+-- Chat Screen
+Group name
+Member list
+Messages
+- Send message (enter to go back, /exit to leave group):
