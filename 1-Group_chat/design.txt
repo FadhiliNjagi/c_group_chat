@@ -1,3 +1,4 @@
+-----------INTERFACE----------------
 1. Log in
 2. Signup
 -----------------------
@@ -25,3 +26,60 @@ Group name
 Member list
 Messages
 - Send message (enter to go back, /exit to leave group):
+
+----------CLIENT-SERVER MODEL-----------
+TCP - each request is a separate socket connection. A new socket is created for every request
+UDP - client sends a request to server and awaits a response, then it continues executing
+
+-- Server
+Stores data in files
+Handles most of the logic
+
+-- Client
+UI
+For each action, it sends a request to the server and continues based on server response
+
+All requests and responses are newline separated
+
+-- Requests
+/login <username> <password>
+  Response:
+    - OK <username> if successful
+    - FAIL
+
+/signup <username> <password>
+  Response:
+    - OK <username> if successful
+    - FAIL
+
+/grouplist <username>
+  Response:
+    - OK, Joined groups, Unjoined groups
+
+/creategroup <group>
+  Response:
+    - OK
+    - FAIL, Group already exists
+
+/groupinfo <username> <groupname>
+  Response:
+    - OK, Is member, Group members, Messages
+    - OK, Not a member
+    - FAIL
+
+/joingroup <username> <groupname>
+  Response:
+    - OK
+    - FAIL, Group is full
+    - FAIL, Group not found
+
+/message <username> <groupname> <message>
+  Response:
+    - OK
+    - FAIL, Group not found
+
+/leavegroup <username> <groupname>
+  Response:
+    - OK
+    - FAIL, Group not found
+

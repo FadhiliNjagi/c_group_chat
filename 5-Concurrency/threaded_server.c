@@ -105,6 +105,7 @@ void *handle_connection(void* arg) {
   recv(client, &request, sizeof(request), 0);
   // Get request type
   token = strtok(request, s);
+  printf("Request type: %s\n", token);
   if (strcmp("/login", token) == 0) {
     strcpy(temp1, strtok(NULL, s));
     strcpy(temp2, strtok(NULL, s));
@@ -142,6 +143,7 @@ void *handle_connection(void* arg) {
   }
   // Close connection
   close(client);
+  printf("[+] Thread is exiting\n");
 }
 
 void load_data() {
@@ -511,7 +513,7 @@ char *get_time() {
 void create_group(char *group_name, int socket) {
   int i;
   for (i = 0; i < groups_no; i++) {
-    if (groups[i].name == group_name) {
+    if (strcmp(groups[i].name, group_name) == 0) {
       snprintf(response, sizeof(response), "FAIL\nGroup already exists.");
       send_response(socket);
       return;

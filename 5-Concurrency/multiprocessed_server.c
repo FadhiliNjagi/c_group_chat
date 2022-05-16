@@ -85,7 +85,6 @@ int main() {
   listen(server_socket, 10); // Queue capacity of 10
   printf("[+] Server is listening...\n");
 
-  // Iterative server
   while (1) {
     // Accept incoming client connections
     client_socket = accept(server_socket, NULL, NULL);
@@ -135,7 +134,7 @@ int main() {
       }
       // Close connection
       close(client_socket);
-      printf("Slave process exiting.\n");
+      printf("[+] Slave process exiting.\n");
       exit(0); // Slave process exits
     }
   }
@@ -510,7 +509,7 @@ char *get_time() {
 void create_group(char *group_name) {
   int i;
   for (i = 0; i < groups_no; i++) {
-    if (groups[i].name == group_name) {
+    if (strcmp(groups[i].name, group_name) == 0) {
       snprintf(response, sizeof(response), "FAIL\nGroup already exists.");
       send_response();
       return;

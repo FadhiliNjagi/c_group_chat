@@ -92,6 +92,7 @@ int main() {
     printf("[+] Incoming request. Processing...\n");
     // Get request type
     token = strtok(request, s);
+    printf("Request type: %s\n", token);
     if (strcmp("/login", token) == 0) {
       strcpy(temp1, strtok(NULL, s));
       strcpy(temp2, strtok(NULL, s));
@@ -499,7 +500,7 @@ char *get_time() {
 void create_group(char *group_name) {
   int i;
   for (i = 0; i < groups_no; i++) {
-    if (groups[i].name == group_name) {
+    if (strcmp(groups[i].name, group_name) == 0) {
       snprintf(response, sizeof(response), "FAIL\nGroup already exists.");
       send_response();
       return;

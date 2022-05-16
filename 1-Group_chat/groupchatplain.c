@@ -136,7 +136,7 @@ int main() {
       if (strcmp(temp, "0") == 0)
         goto Mainmenu;
       for (i = 0; i < groups_no; i++) {
-        if (groups[i].name == temp) {
+        if (strcmp(groups[i].name, temp) == 0) {
           printf("Group already exists.\n");
           goto create;
         }
