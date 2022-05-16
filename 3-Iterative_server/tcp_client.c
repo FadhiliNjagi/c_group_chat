@@ -141,7 +141,7 @@ int main() {
           goto Mainmenu;
         }
       } else {
-        printf("Error creating group");
+        printf("%s\n", strtok(NULL, s));
       }
       goto Mainmenu;
       break;
