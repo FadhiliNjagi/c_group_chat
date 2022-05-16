@@ -1,11 +1,13 @@
 /*
   TCP SERVER GROUP CHAT
+  Using Async I/O (select) for concurrency
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <sys/select.h>
 
 // Socket libraries
 #include <sys/types.h>
@@ -40,30 +42,31 @@ int users_no = 0, messages_no = 0, groups_no = 0;
 int server_socket, client_socket;
 struct sockaddr_in server_address;
 char request[2048], response[2048];
+const char s[2] = "\n";
 
 // Function protoypes
 void load_data();
 void send_response();
-void login(char *username, char *password);
-void signup(char *username, char *password);
+void login(char *username, char *password, int socket);
+void signup(char *username, char *password, int socket);
 void load_group_messages();
 void update_users();
 void update_messages();
 void update_groups();
-void group_screen(char *username, char *group_name);
-void join_group(char *username, char *group_name);
-void leave_group(char *username, char *group_name);
-void group_list(char *username);
-void send_message(char *username, char *group_name, char *message);
+void group_screen(char *username, char *group_name, int socket);
+void join_group(char *username, char *group_name, int socket);
+void leave_group(char *username, char *group_name, int socket);
+void group_list(char *username, int socket);
+void send_message(char *username, char *group_name, char *message, int socket);
 char *get_time();
-void create_group(char *group_name);
+void create_group(char *group_name, int socket);
+void *handle_connection(int client);
 
 int main() {
-  int i, j;
-  char *token;
-  const char s[2] = "\n";
-  char temp1[30], temp2[30], buffer[160];
-  pid_t pid;
+  int i, max_sockets_so_far = 0;
+  // Load data
+  load_data();
+  load_group_messages();
 
   // Create a socket
   server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -81,64 +84,92 @@ int main() {
   listen(server_socket, 10); // Queue capacity of 10
   printf("[+] Server is listening...\n");
 
+  // FD sets
+  fd_set current_sockets, ready_sockets;
+  // Initialize current FD set
+  FD_ZERO(&current_sockets);
+  // Add serer socket to current FD set
+  FD_SET(server_socket, &current_sockets);
+  max_sockets_so_far = server_socket;
+
+  // Master thread
   while (1) {
-    // Accept incoming client connections
-    client_socket = accept(server_socket, NULL, NULL);
-    printf("[+] Incoming connection. Creating new process...\n");
-    // Create slave process to handle request
-    if (0 == (pid = fork())) { // If slave process
-      printf("New slave process created.\n");
-      // Receive request
-      recv(client_socket, &request, sizeof(request), 0);
-      // Load data
-      load_data();
-      load_group_messages();
-      // Get request type
-      token = strtok(request, s);
-      printf("Request type: %s\n", token);
-      if (strcmp("/login", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        login(temp1, temp2);
-      } else if (strcmp("/signup", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        signup(temp1, temp2);
-      } else if (strcmp("/groupinfo", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        group_screen(temp1, temp2);
-      } else if (strcmp("/grouplist", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        group_list(temp1);
-      } else if (strcmp("/joingroup", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        join_group(temp1, temp2);
-      } else if (strcmp("/leavegroup", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        leave_group(temp1, temp2);
-      } else if (strcmp("/creategroup", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        create_group(temp1);
-      } else if (strcmp("/message", token) == 0) {
-        strcpy(temp1, strtok(NULL, s));
-        strcpy(temp2, strtok(NULL, s));
-        strcpy(buffer, strtok(NULL, s));
-        send_message(temp1, temp2, buffer);
-      } else {
-        strcpy(request, "Unrecognized request");
-        send_response();
+    // Copy current FD set bcoz select is destructive
+    ready_sockets = current_sockets;
+
+    if (select(max_sockets_so_far, &ready_sockets, NULL, NULL, NULL) < 0) {
+      printf("Select error.\n");
+      exit(1);
+    }
+    for (i = 0; i <= max_sockets_so_far; i++) {
+      if (FD_ISSET(i, &ready_sockets)) {
+        if (i == server_socket) {
+          // Accept new connection
+          client_socket = accept(server_socket, NULL, NULL);
+          printf("[+] Accepting incoming connection.\n");
+          FD_SET(client_socket, &current_sockets); // Add client socket to current FD set
+          if (client_socket > max_sockets_so_far) {
+            max_sockets_so_far = client_socket;
+          }
+        } else {
+          // Process request
+          handle_connection(i);
+          FD_CLR(i, &current_sockets);  // Remove client socket from current FD set
+        }
       }
-      // Close connection
-      close(client_socket);
-      printf("[+] Slave process exiting.\n");
-      exit(0); // Slave process exits
     }
   }
 
   return 0;
+}
+
+void *handle_connection(int client) {
+  char *token;
+  char temp1[30], temp2[30], buffer[160];
+
+  // Receive request
+  recv(client, &request, sizeof(request), 0);
+  // Get request type
+  token = strtok(request, s);
+  printf("Handling request of type: %s\n", token);
+  if (strcmp("/login", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    login(temp1, temp2, client);
+  } else if (strcmp("/signup", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    signup(temp1, temp2, client);
+  } else if (strcmp("/groupinfo", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    group_screen(temp1, temp2, client);
+  } else if (strcmp("/grouplist", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    group_list(temp1, client);
+  } else if (strcmp("/joingroup", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    join_group(temp1, temp2, client);
+  } else if (strcmp("/leavegroup", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    leave_group(temp1, temp2, client);
+  } else if (strcmp("/creategroup", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    create_group(temp1, client);
+  } else if (strcmp("/message", token) == 0) {
+    strcpy(temp1, strtok(NULL, s));
+    strcpy(temp2, strtok(NULL, s));
+    strcpy(buffer, strtok(NULL, s));
+    send_message(temp1, temp2, buffer, client);
+  } else {
+    strcpy(request, "Unrecognized request");
+    send_response(client);
+  }
+  // Close connection
+  close(client);
+  printf("[+] Thread is exiting\n");
 }
 
 void load_data() {
@@ -295,33 +326,33 @@ void update_groups() {
   fclose(fp);
 }
 
-void send_response() {
+void send_response(int socket) {
   // Sending response
-  send(client_socket, response, sizeof(response), 0);
+  send(socket, response, sizeof(response), 0);
 }
 
-void login(char *username, char *password) {
+void login(char *username, char *password, int socket) {
   /* Check for matching username, password pair */
   int i;
   for (i = 0; i < users_no; i++) {
     if ((strcmp(users[i].username, username) == 0) && (strcmp(users[i].password, password) == 0)) {
       snprintf(response, sizeof(response), "OK\n%s", username);
-      send_response();
+      send_response(socket);
       return;
     }
   }
   snprintf(response, sizeof(response), "FAIL");
-  send_response();
+  send_response(socket);
   return;
 }
 
-void signup(char *username, char *password) {
+void signup(char *username, char *password, int socket) {
   int i;
   // Check if username is available
   for (i = 0; i < users_no; i++) {
     if (strcmp(users[i].username, username) == 0) {
       snprintf(response, sizeof(response), "FAIL");
-      send_response();
+      send_response(socket);
       return;
     }
   }
@@ -330,11 +361,11 @@ void signup(char *username, char *password) {
   users_no++;
   update_users();
   snprintf(response, sizeof(response), "OK\n%s", username);
-  send_response();
+  send_response(socket);
   return;
 }
 
-void group_screen(char *username, char *group_name) {
+void group_screen(char *username, char *group_name, int socket) {
   int i, j, flag, group_index = -1;
   char buffer[256];
   // Check if group exists
@@ -346,7 +377,7 @@ void group_screen(char *username, char *group_name) {
   }
   if (group_index == -1) {
     snprintf(response, sizeof(response), "FAIL");
-    send_response();
+    send_response(socket);
     return;
   }
   // Check if current user is a member
@@ -367,15 +398,15 @@ void group_screen(char *username, char *group_name) {
         // Apend to response
         strcat(response, buffer);
       }
-      send_response();
+      send_response(socket);
       return;
     }
   }
   snprintf(response, sizeof(response), "OK\nNot a member");
-  send_response();
+  send_response(socket);
 }
 
-void join_group(char *username, char *group_name) {
+void join_group(char *username, char *group_name, int socket) {
   int i, j, index = -1;
   for (i = 0; i < groups_no; i++) {
     if (strcmp(groups[i].name, group_name) == 0) {
@@ -385,7 +416,7 @@ void join_group(char *username, char *group_name) {
   }
   if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
-    send_response();
+    send_response(socket);
     return;
   }
   for (j = 0; j < 10; j++) {
@@ -393,15 +424,15 @@ void join_group(char *username, char *group_name) {
       strcpy(groups[index].members[j], username);
       update_groups();
       snprintf(response, sizeof(response), "OK");
-      send_response();
+      send_response(socket);
       return;
     }
   }
   snprintf(response, sizeof(response), "FAIL\nGroup is full");
-  send_response();
+  send_response(socket);
 }
 
-void leave_group(char *username, char *group_name) {
+void leave_group(char *username, char *group_name, int socket) {
   int i, j, index = -1;
   for (i = 0; i < groups_no; i++) {
     if (strcmp(groups[i].name, group_name) == 0) {
@@ -411,7 +442,7 @@ void leave_group(char *username, char *group_name) {
   }
   if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
-    send_response();
+    send_response(socket);
     return;
   }
   // Find current user and delete
@@ -423,16 +454,16 @@ void leave_group(char *username, char *group_name) {
       strcpy(groups[index].members[9], "");
       update_groups();
       snprintf(response, sizeof(response), "OK");
-      send_response();
+      send_response(socket);
       return;
     }
   }
   snprintf(response, sizeof(response), "FAIL\nYou are not a member of the group.");
-  send_response();
+  send_response(socket);
   return;
 }
 
-void group_list(char *username) {
+void group_list(char *username, int socket) {
   int i, j, flag;
   char buffer[256];
   strcpy(response, "OK\n[+] Joined Groups\n");
@@ -459,10 +490,10 @@ void group_list(char *username) {
       strcat(response, buffer);
     }
   }
-  send_response();
+  send_response(socket);
 }
 
-void send_message(char *username, char *group_name, char *message) {
+void send_message(char *username, char *group_name, char *message, int socket) {
   int i, j, index = -1;
   for (i = 0; i < groups_no; i++) {
     if (strcmp(groups[i].name, group_name) == 0) {
@@ -472,7 +503,7 @@ void send_message(char *username, char *group_name, char *message) {
   }
   if (index == -1) {
     snprintf(response, sizeof(response), "FAIL\nGroup not found");
-    send_response();
+    send_response(socket);
     return;
   }
   // Construct message
@@ -491,7 +522,7 @@ void send_message(char *username, char *group_name, char *message) {
 
   update_messages();
   snprintf(response, sizeof(response), "OK");
-  send_response();
+  send_response(socket);
 }
 
 char *get_time() {
@@ -505,12 +536,12 @@ char *get_time() {
   return result;
 }
 
-void create_group(char *group_name) {
+void create_group(char *group_name, int socket) {
   int i;
   for (i = 0; i < groups_no; i++) {
     if (strcmp(groups[i].name, group_name) == 0) {
       snprintf(response, sizeof(response), "FAIL\nGroup already exists.");
-      send_response();
+      send_response(socket);
       return;
     }
   }
@@ -518,5 +549,5 @@ void create_group(char *group_name) {
   groups_no++;
   update_groups();
   snprintf(response, sizeof(response), "OK");
-  send_response();
+  send_response(socket);
 }

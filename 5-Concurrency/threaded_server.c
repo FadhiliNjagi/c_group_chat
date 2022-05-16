@@ -41,7 +41,7 @@ Group groups[20];
 int users_no = 0, messages_no = 0, groups_no = 0;
 int server_socket, client_socket;
 struct sockaddr_in server_address;
-char request[256], response[256];
+char request[2048], response[2048];
 const char s[2] = "\n";
 
 // Function protoypes
@@ -60,7 +60,7 @@ void group_list(char *username, int socket);
 void send_message(char *username, char *group_name, char *message, int socket);
 char *get_time();
 void create_group(char *group_name, int socket);
-void *handle_connection();
+void *handle_connection(void* arg);
 
 int main() {
   pthread_t tid;
@@ -84,7 +84,7 @@ int main() {
   listen(server_socket, 10); // Queue capacity of 10
   printf("[+] Server is listening...\n");
 
-  // Master program
+  // Master thread
   while (1) {
     // Accept incoming client connections
     client_socket = accept(server_socket, NULL, NULL);

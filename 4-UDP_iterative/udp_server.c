@@ -39,7 +39,7 @@ Group groups[20];
 int users_no = 0, messages_no = 0, groups_no = 0;
 int server_socket, client_socket;
 struct sockaddr_in server_address, client_address;
-char request[256], response[256];
+char request[2048], response[2048];
 
 // Function protoypes
 void load_data();

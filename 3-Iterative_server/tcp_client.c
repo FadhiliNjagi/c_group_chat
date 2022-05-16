@@ -13,7 +13,7 @@
 #include <unistd.h> // Close function
 
 // Global variables
-char request[256], response[256], logged_in_user[30];
+char request[2048], response[2048], logged_in_user[30];
 char separator[] = "---------------------------------------------------\n";
 const char s[2] = "\n";
 struct sockaddr_in server_address;

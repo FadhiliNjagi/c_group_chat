@@ -41,6 +41,7 @@ For each action, it sends a request to the server and continues based on server 
 
 All requests and responses are newline separated
 
+
 -- Requests
 /login <username> <password>
   Response:
@@ -65,7 +66,7 @@ All requests and responses are newline separated
   Response:
     - OK, Is member, Group members, Messages
     - OK, Not a member
-    - FAIL
+    - FAIL if group not found
 
 /joingroup <username> <groupname>
   Response:
@@ -82,4 +83,5 @@ All requests and responses are newline separated
   Response:
     - OK
     - FAIL, Group not found
+
 
